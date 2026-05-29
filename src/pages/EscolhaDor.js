@@ -15,15 +15,24 @@ const DORES = [
   { label:'Outra', emoji:'💭' },
 ]
 
-// Consciência sempre com key padronizada
 const DIMS = [
   { key:'Corpo', emoji:'❤️', cor:'#B94A3E' },
   { key:'Mente', emoji:'🧠', cor:'#3D9ED8' },
-  { key:'Consciencia', emoji:'✨', cor:'#7A4FB8' },
+  { key:'Consciencia', emoji:'✨', cor:'#7A4FB8', label:'Consciência' },
 ]
 
+// Normaliza instancia para chave padrão
+function normalizarInstancia(inst) {
+  if (!inst) return ''
+  const v = inst.toLowerCase().trim()
+  if (v === 'corpo') return 'Corpo'
+  if (v === 'mente') return 'Mente'
+  if (v === 'consciencia' || v === 'consciência' || v === 'espiritual') return 'Consciencia'
+  return inst
+}
+
 export default function EscolhaDor() {
-  const { user, perfil, atualizarPerfil } = useAuth()
+  const { user, atualizarPerfil } = useAuth()
   const navigate = useNavigate()
   const [etapa, setEtapa] = useState('escolha')
   const [selecionada, setSelecionada] = useState('')
@@ -33,16 +42,24 @@ export default function EscolhaDor() {
   const [curtidas, setCurtidas] = useState(new Set())
   const [lendo, setLendo] = useState(null)
 
-  // Clique na dor → vai direto para conteúdos
   async function selecionarDor(dor) {
     setSelecionada(dor)
-    if (dor === 'Outra') return // aguarda texto e confirmação manual
+    if (dor === 'Outra') return
     await atualizarPerfil({ dor_selecionada: dor })
     setLoadingC(true)
     setEtapa('conteudos')
-    const { data } = await supabase.from('conteudos').select('*')
-      .eq('status','Aprovado').eq('dor', dor).limit(12)
-    setConteudos(data || [])
+    // Busca todos os conteúdos da dor — normaliza no front
+    const { data } = await supabase
+      .from('conteudos').select('*').eq('status','Aprovado').eq('dor', dor).limit(20)
+    // Remove duplicatas por id e normaliza instancia
+    const vistos = new Set()
+    const limpos = (data || []).filter(c => {
+      if (vistos.has(c.id)) return false
+      vistos.add(c.id)
+      c.instancia = normalizarInstancia(c.instancia)
+      return true
+    })
+    setConteudos(limpos)
     setLoadingC(false)
   }
 
@@ -53,7 +70,9 @@ export default function EscolhaDor() {
 
   async function marcarAjudou(c) {
     if (!user || curtidas.has(c.id)) return
-    await supabase.from('curtidas').upsert({ user_id:user.id, conteudo_id:c.id, dimensao:c.instancia }, { onConflict:'user_id,conteudo_id' })
+    await supabase.from('curtidas').upsert({
+      user_id:user.id, conteudo_id:c.id, dimensao:c.instancia
+    }, { onConflict:'user_id,conteudo_id' })
     setCurtidas(prev => new Set([...prev, c.id]))
   }
 
@@ -65,8 +84,10 @@ export default function EscolhaDor() {
     const vozes = window.speechSynthesis.getVoices()
     const voz = vozes.find(v => v.lang.startsWith('pt')) || vozes[0]
     if (voz) u.voice = voz
-    u.onend = () => setLendo(null); u.onerror = () => setLendo(null)
-    setLendo(id); window.speechSynthesis.speak(u)
+    u.onend = () => setLendo(null)
+    u.onerror = () => setLendo(null)
+    setLendo(id)
+    window.speechSynthesis.speak(u)
   }
 
   return (
@@ -74,33 +95,28 @@ export default function EscolhaDor() {
       <NavActions/>
       <div style={{ padding:'12px 16px', paddingBottom:'calc(120px + env(safe-area-inset-bottom,16px))', overflowY:'auto' }}>
 
-        {/* ETAPA ESCOLHA */}
         {etapa === 'escolha' && (
           <>
             <p style={{ fontSize:10, letterSpacing:3, color:'#C99A3D', textTransform:'uppercase', marginBottom:4 }}>AUTO AVALIAÇÃO</p>
             <h2 style={{ fontFamily:'Cinzel, serif', fontSize:20, color:'#F7F1E5', marginBottom:6 }}>O que mais pede atenção hoje?</h2>
-            <p style={{ fontSize:12, color:'#B8AFA0', marginBottom:20, lineHeight:1.5 }}>
-              Toque em uma opção para ver conteúdos direcionados.
-            </p>
+            <p style={{ fontSize:12, color:'#B8AFA0', marginBottom:20, lineHeight:1.5 }}>Toque para ver conteúdos direcionados.</p>
 
             <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:16 }}>
               {DORES.map(d => (
                 <div key={d.label}>
                   <button onClick={() => selecionarDor(d.label)}
-                    style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', background: selecionada===d.label?'rgba(201,154,61,0.08)':'#111B20', border: selecionada===d.label?'1px solid #C99A3D':'1px solid rgba(201,154,61,0.2)', borderRadius:14, padding:'14px 18px', color: selecionada===d.label?'#C99A3D':'#F7F1E5', fontSize:14, fontWeight:500, cursor:'pointer', textAlign:'left', fontFamily:'Inter, sans-serif', transition:'all 0.15s' }}>
+                    style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', background: selecionada===d.label?'rgba(201,154,61,0.08)':'#111B20', border: selecionada===d.label?'1px solid #C99A3D':'1px solid rgba(201,154,61,0.2)', borderRadius:14, padding:'14px 18px', color: selecionada===d.label?'#C99A3D':'#F7F1E5', fontSize:14, fontWeight:500, cursor:'pointer', textAlign:'left', fontFamily:'Inter, sans-serif' }}>
                     <span style={{ display:'flex', alignItems:'center', gap:12 }}>
                       <span style={{ fontSize:20 }}>{d.emoji}</span>{d.label}
                     </span>
-                    {selecionada===d.label && d.label !== 'Outra' && <span style={{ fontSize:12 }}>→</span>}
+                    {selecionada===d.label && d.label!=='Outra' && <span style={{ fontSize:12 }}>→</span>}
                   </button>
-
-                  {/* Campo "Outra" aparece inline, abaixo do botão */}
-                  {d.label === 'Outra' && selecionada === 'Outra' && (
+                  {d.label==='Outra' && selecionada==='Outra' && (
                     <div style={{ background:'rgba(201,154,61,0.04)', border:'1px solid rgba(201,154,61,0.2)', borderRadius:'0 0 14px 14px', padding:14, marginTop:-4 }}>
                       <textarea value={outraTexto} onChange={e => setOutraTexto(e.target.value)}
                         placeholder="Conte um pouco sobre o que está sentindo..."
                         style={{ width:'100%', minHeight:64, borderRadius:10, padding:'10px 12px', background:'rgba(0,0,0,0.2)', border:'1px solid rgba(201,154,61,0.2)', color:'#F7F1E5', fontSize:13, fontFamily:'Inter, sans-serif', outline:'none', resize:'none', lineHeight:1.5, marginBottom:8 }}/>
-                      <p style={{ fontSize:12, color:'#B8AFA0', marginBottom:12, lineHeight:1.6, fontStyle:'italic' }}>
+                      <p style={{ fontSize:12, color:'#B8AFA0', marginBottom:12, fontStyle:'italic' }}>
                         Em breve queremos ampliar conteúdos para situações como essa. Obrigada por nos contar.
                       </p>
                       <button onClick={confirmarOutra}
@@ -115,7 +131,6 @@ export default function EscolhaDor() {
           </>
         )}
 
-        {/* ETAPA CONTEÚDOS */}
         {etapa === 'conteudos' && (
           <>
             <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:16 }}>
@@ -138,19 +153,13 @@ export default function EscolhaDor() {
               </div>
             )}
 
-            {/* Sempre mostra as 3 dimensões */}
             {!loadingC && DIMS.map(dim => {
-              // Busca por instancia exata E variações de grafia
-              const items = conteudos.filter(c =>
-                c.instancia === dim.key ||
-                c.instancia?.toLowerCase() === dim.key.toLowerCase() ||
-                (dim.key === 'Consciencia' && (c.instancia === 'Consciência' || c.instancia === 'consciencia' || c.instancia === 'espiritual' || c.instancia === 'Espiritual'))
-              )
+              const items = conteudos.filter(c => c.instancia === dim.key)
               if (!items.length) return null
               return (
                 <div key={dim.key} style={{ marginBottom:20 }}>
-                  <p style={{ fontSize:11, color:dim.cor, letterSpacing:2, textTransform:'uppercase', marginBottom:10, display:'flex', alignItems:'center', gap:6 }}>
-                    <span style={{ fontSize:16 }}>{dim.emoji}</span> {dim.key === 'Consciencia' ? 'Consciência' : dim.key}
+                  <p style={{ fontSize:11, color:dim.cor, letterSpacing:2, textTransform:'uppercase', marginBottom:10 }}>
+                    {dim.emoji} {dim.label || dim.key}
                   </p>
                   {items.map(c => (
                     <div key={c.id} style={{ background:'linear-gradient(180deg,#111B20,#0A1013)', border:`1px solid ${curtidas.has(c.id)?dim.cor:'rgba(201,154,61,0.15)'}`, borderRadius:14, padding:14, marginBottom:10 }}>
@@ -181,7 +190,6 @@ export default function EscolhaDor() {
               )
             })}
 
-            {/* Botão Home discreto no final */}
             {!loadingC && (
               <button onClick={() => navigate('/home')}
                 style={{ width:'100%', height:42, borderRadius:12, background:'transparent', border:'1px solid rgba(201,154,61,0.15)', color:'#B8AFA0', fontSize:12, fontFamily:'Inter, sans-serif', cursor:'pointer', marginTop:4 }}>

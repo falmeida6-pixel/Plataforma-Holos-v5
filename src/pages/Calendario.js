@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { useNavigate } from 'react-router-dom'
 import NavActions from '../components/NavActions'
+import { hojeLocal } from '../lib/dataLocal'
 
 export default function Calendario() {
   const { user } = useAuth()
@@ -12,7 +13,7 @@ export default function Calendario() {
   const [gratidoes, setGratidoes] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const hoje = new Date().toISOString().split('T')[0]
+  const hoje = hojeLocal()
 
   useEffect(() => { if (user) carregar() }, [user])
 

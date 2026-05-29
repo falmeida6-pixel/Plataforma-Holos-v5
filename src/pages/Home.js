@@ -23,7 +23,6 @@ const BLOCOS = [
       { path:'/calendario', emoji:'📅', label:'Calendário', desc:'Sua consistência' },
       { path:'/mapa', emoji:'🗺️', label:'Mapa Holos', desc:'Equilíbrio das dimensões', premium:true },
       { path:'/avaliacao', emoji:'📊', label:'Avaliação Evolutiva', desc:'Análise do perfil', premium:true },
-      { path:'/caminho', emoji:'🌱', label:'Meu Caminho', desc:'Sua memória emocional' },
     ]
   },
   {
@@ -38,13 +37,13 @@ const BLOCOS = [
     titulo:'CONTA', cor:'#B8AFA0',
     itens:[
       { path:'/premium', emoji:'👑', label:'Premium', desc:'Plano e benefícios' },
-      { path:'/perfil', emoji:'👤', label:'Perfil', desc:'Seus dados e evolução' },
+      { path:'/perfil', emoji:'👤', label:'Perfil', desc:'Sua trajetória e dados' },
     ]
   },
   {
     titulo:'FERRAMENTAS', cor:'#8A6424',
     itens:[
-      { path:'/store', emoji:'🛍️', label:'Holos Store', desc:'Produtos curados para sua jornada' },
+      { path:'/store', emoji:'🛍️', label:'Holos Store', desc:'Produtos curados' },
       { path:'/jornada', emoji:'🧠', label:'Jornada Holos', desc:'Programas e contato' },
     ]
   },
@@ -58,7 +57,7 @@ export default function Home() {
 
   let mensagem = 'Bem-vinda! Sua jornada começa aqui. 🌱'
   if (checkins >= 21) mensagem = `${checkins} registros — você está construindo algo sólido! 🏆`
-  else if (checkins >= 7) mensagem = `${checkins} check-ins feitos — a consistência é o caminho. ✨`
+  else if (checkins >= 7) mensagem = `${checkins} check-ins feitos — a consistência transforma. ✨`
   else if (checkins >= 1) mensagem = `${checkins} check-in${checkins>1?'s':''} realizado${checkins>1?'s':''} — cada dia conta. 💪`
 
   return (

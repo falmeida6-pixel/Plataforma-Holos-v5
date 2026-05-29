@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { useNavigate } from 'react-router-dom'
 import NavActions from '../components/NavActions'
+import { hojeLocal } from '../lib/dataLocal'
 
 const ABAS = [
   { id:'resumo', label:'Resumo' },
@@ -22,7 +23,7 @@ export default function MeuCaminho() {
   const [gratidoes, setGratidoes] = useState([])
   const [curtidas, setCurtidas] = useState([])
 
-  const hoje = new Date().toISOString().split('T')[0]
+  const hoje = hojeLocal()
   const inicioSemana = (() => { const d=new Date(); d.setDate(d.getDate()-6); return d.toISOString().split('T')[0] })()
 
   useEffect(() => { if (user) carregar() }, [user])

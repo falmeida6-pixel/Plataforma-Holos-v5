@@ -28,24 +28,11 @@ export default function ReflexaoDiaria() {
     setLoading(false)
   }
 
-  function getMensagemCompartilhar() {
-    return `📅 ${dataStr}\n\n"${reflexao?.texto_reflexao || 'A direção é para dentro.'}"\n\nEstou utilizando a ${APP_NAME} para desenvolver Corpo, Mente e Consciência.\n\nConheça:\n${APP_URL}\n\n🌳 ${APP_NAME}\n${APP_TAGLINE}`
-  }
-
-  async function compartilhar() {
+  // Sempre abre WhatsApp diretamente — sem navigator.share
+  function compartilhar() {
     if (!reflexao) return
-    const mensagem = getMensagemCompartilhar()
-    // Prioridade 1: navigator.share (mobile nativo)
-    if (navigator.share) {
-      try {
-        await navigator.share({ text: mensagem })
-        return
-      } catch (e) {
-        // usuário cancelou ou não suportado — fallback
-      }
-    }
-    // Prioridade 2: WhatsApp
-    window.open(`https://wa.me/?text=${encodeURIComponent(mensagem)}`, '_blank')
+    const msg = `📅 ${dataStr}\n\n"${reflexao.texto_reflexao}"\n\nEstou utilizando a ${APP_NAME} para desenvolver Corpo, Mente e Consciência.\n\nConheça:\n${APP_URL}\n\n🌳 ${APP_NAME}\n${APP_TAGLINE}`
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
   function ouvir() {
@@ -80,25 +67,18 @@ export default function ReflexaoDiaria() {
         paddingBottom:'calc(100px + env(safe-area-inset-bottom,16px))',
         overflowY:'auto', WebkitOverflowScrolling:'touch',
       }}>
-        {/* Data */}
         <p style={{ fontSize:11, color:'#B8AFA0', textAlign:'center', marginBottom:16, textTransform:'capitalize' }}>
           {dataFormatada}
         </p>
-
-        {/* Label */}
         <div style={{ textAlign:'center', marginBottom:24 }}>
           <p style={{ fontSize:10, letterSpacing:4, textTransform:'uppercase', color:'#C99A3D', fontWeight:600, marginBottom:10 }}>REFLEXÃO DO DIA</p>
           <div style={{ width:32, height:1, background:'rgba(201,154,61,0.45)', margin:'0 auto' }}/>
         </div>
-
-        {/* Frase */}
         <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', minHeight:120, marginBottom:24 }}>
           <p style={{ fontFamily:'Cinzel, serif', fontSize:18, lineHeight:1.9, color:'#F7F1E5', fontWeight:500, textAlign:'center' }}>
             {reflexao ? `"${reflexao.texto_reflexao}"` : '"A direção é para dentro."'}
           </p>
         </div>
-
-        {/* Botões secundários */}
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:12 }}>
           <button onClick={compartilhar}
             style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:'linear-gradient(135deg,#B7832F,#F0C76A)', border:'none', borderRadius:12, height:46, cursor:'pointer' }}>
@@ -111,7 +91,6 @@ export default function ReflexaoDiaria() {
             <span style={{ fontSize:13, color: lendo?'#C99A3D':'#B8AFA0', fontWeight:600, fontFamily:'Inter, sans-serif' }}>{lendo?'Parar':'Ouvir'}</span>
           </button>
         </div>
-
         <button onClick={() => navigate('/checkin')}
           style={{ width:'100%', height:50, borderRadius:13, background:'linear-gradient(135deg,#B7832F,#F0C76A)', color:'#080808', fontSize:15, fontWeight:700, fontFamily:'Inter, sans-serif', border:'none', cursor:'pointer', marginBottom:10 }}>
           ✅ Fazer Check-in Diário

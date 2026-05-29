@@ -12,7 +12,6 @@ import MapaHolos from './pages/MapaHolos'
 import AnaliseHolos from './pages/AnaliseHolos'
 import EscolhaDor from './pages/EscolhaDor'
 import Home from './pages/Home'
-import MeuCaminho from './pages/MeuCaminho'
 import RodasHolos from './pages/RodasHolos'
 import ClubeHolos from './pages/ClubeHolos'
 import Profissionais from './pages/Profissionais'
@@ -136,7 +135,6 @@ function AppRoutes() {
             <Route path="/analise" element={<AnaliseHolos/>}/>
             <Route path="/dor" element={<EscolhaDor/>}/>
             <Route path="/dores" element={<EscolhaDor/>}/>
-            <Route path="/caminho" element={<MeuCaminho/>}/>
             <Route path="/rodas" element={<RodasHolos/>}/>
             <Route path="/clube" element={<ClubeHolos/>}/>
             <Route path="/profissionais" element={<Profissionais/>}/>
@@ -146,6 +144,8 @@ function AppRoutes() {
             <Route path="/premium" element={<Premium/>}/>
             <Route path="/perfil" element={<Perfil/>}/>
             <Route path="/final" element={<TelaFinal/>}/>
+            {/* redireciona /caminho para /perfil */}
+            <Route path="/caminho" element={<Navigate to="/perfil" replace/>}/>
             <Route path="*" element={<Navigate to="/" replace/>}/>
           </>
         )}
