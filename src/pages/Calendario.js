@@ -33,6 +33,8 @@ export default function Calendario() {
   const parciais = checkins.filter(c => c.status_dia === 'Parcial').length
   const totalDiarios = diarios.length
   const totalGratidoes = gratidoes.length
+  const diasComCheckin = new Set(checkins.map(c => c.data)).size
+  const diasSemRegistro = Math.max(0, new Date().getDate() - diasComCheckin)
 
   function getMensagem() {
     const total = checkins.length
@@ -76,6 +78,7 @@ export default function Calendario() {
           {[
             [completos,'✅ Completos','#5AC878'],
             [parciais,'◐ Parciais','#D7A23D'],
+            [diasSemRegistro,'○ Sem registro','#D85C4A'],
             [totalDiarios,'📓 Diários','#3D9ED8'],
             [totalGratidoes,'🙏 Gratidões','#C99A3D'],
           ].map(([v,l,c]) => (

@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { useNavigate } from 'react-router-dom'
 import NavActions from '../components/NavActions'
+import { hojeLocal } from '../lib/dataLocal'
 
 const DIMS = [
   { key:'corpo', label:'Corpo', emoji:'❤️', cor:'#B94A3E' },
@@ -26,7 +27,7 @@ export default function AnaliseHolos() {
     setSalvando(true)
     await supabase.from('checkins').upsert({
       user_id: user.id, email_usuario: user.email,
-      data: new Date().toISOString().split('T')[0],
+      data: hojeLocal(),
       nota_geral: nota,
       dimensao_cuidado: pesou.key ? `${pesou.key}: ${pesou.texto}` : '',
       palavra_chave: leveza.key ? `${leveza.key}: ${leveza.texto}` : '',

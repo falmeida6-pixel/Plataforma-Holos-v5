@@ -14,15 +14,23 @@ export default function Gratidao() {
   const [jaFezHoje, setJaFezHoje] = useState(false)
   const [completo, setCompleto] = useState(false)
   const [regHoje, setRegHoje] = useState(null)
+  const [aceite, setAceite] = useState(false)
+  const [aceiteSalvo, setAceiteSalvo] = useState(false)
 
   const hj = hojeLocal()
   const dataFormatada = new Date(hj + 'T12:00:00').toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' })
 
-  useEffect(() => { if (user) carregar() }, [user])
+  useEffect(() => {
+    if (!user) return
+    const ok = localStorage.getItem(`holos_gratidao_aceite_${user.id}`) === 'sim'
+    setAceite(ok)
+    setAceiteSalvo(ok)
+    carregar()
+  }, [user])
 
   async function carregar() {
     const { data } = await supabase
-      .from('gratidao').select('*').eq('user_id', user.id).eq('data', hj).single()
+      .from('gratidao').select('*').eq('user_id', user.id).eq('data', hj).maybeSingle()
     if (data) {
       setJaFezHoje(true)
       setRegHoje(data)
@@ -33,6 +41,11 @@ export default function Gratidao() {
   }
 
   async function salvar() {
+    if (!aceite) return
+    if (!aceiteSalvo) {
+      localStorage.setItem(`holos_gratidao_aceite_${user.id}`, 'sim')
+      setAceiteSalvo(true)
+    }
     if (itens.filter(i => i.trim()).length === 0) return
     setSalvando(true)
     const payload = { user_id:user.id, data:hj, item1:itens[0], item2:itens[1], item3:itens[2] }
@@ -62,11 +75,19 @@ export default function Gratidao() {
         </p>
 
         {/* Autorização discreta */}
-        <div style={{ background:'rgba(201,154,61,0.04)', border:'1px solid rgba(201,154,61,0.12)', borderRadius:12, padding:12, marginBottom:16 }}>
-          <p style={{ fontSize:11, color:'#B8AFA0', lineHeight:1.6 }}>
-            🔒 Seus registros são privados e usados apenas para acompanhar sua jornada dentro da Plataforma Holos.
-          </p>
-        </div>
+        {!aceiteSalvo && (
+          <label style={{ display:'flex', alignItems:'flex-start', gap:10, background:'rgba(201,154,61,0.04)', border:'1px solid rgba(201,154,61,0.12)', borderRadius:12, padding:12, marginBottom:16, cursor:'pointer' }}>
+            <input type="checkbox" checked={aceite} onChange={e => setAceite(e.target.checked)} style={{ marginTop:2, accentColor:'#C99A3D' }}/>
+            <span style={{ fontSize:11, color:'#B8AFA0', lineHeight:1.6 }}>
+              🔒 Seus registros são privados e usados apenas para acompanhar sua jornada dentro da Plataforma Holos.
+            </span>
+          </label>
+        )}
+        {aceiteSalvo && (
+          <div style={{ background:'rgba(201,154,61,0.04)', border:'1px solid rgba(201,154,61,0.12)', borderRadius:12, padding:12, marginBottom:16 }}>
+            <p style={{ fontSize:11, color:'#B8AFA0', lineHeight:1.6 }}>🔒 Registros autorizados para acompanhamento da sua jornada.</p>
+          </div>
+        )}
 
         {/* Já registrou as 3 hoje */}
         {completo && (
@@ -116,8 +137,8 @@ export default function Gratidao() {
               </div>
             ))}
 
-            <button onClick={salvar} disabled={salvando || itens.filter(i=>i.trim()).length===0}
-              style={{ width:'100%', height:50, borderRadius:13, background: itens.filter(i=>i.trim()).length>0?'linear-gradient(135deg,#B7832F,#F0C76A)':'rgba(201,154,61,0.08)', color: itens.filter(i=>i.trim()).length>0?'#080808':'#B8AFA0', fontSize:15, fontWeight:700, fontFamily:'Inter, sans-serif', border:'none', cursor:'pointer', marginBottom:12 }}>
+            <button onClick={salvar} disabled={salvando || !aceite || itens.filter(i=>i.trim()).length===0}
+              style={{ width:'100%', height:50, borderRadius:13, background: (aceite && itens.filter(i=>i.trim()).length>0)?'linear-gradient(135deg,#B7832F,#F0C76A)':'rgba(201,154,61,0.08)', color: (aceite && itens.filter(i=>i.trim()).length>0)?'#080808':'#B8AFA0', fontSize:15, fontWeight:700, fontFamily:'Inter, sans-serif', border:'none', cursor:'pointer', marginBottom:12 }}>
               {salvando ? 'Salvando...' : jaFezHoje ? '✓ Atualizar gratidão' : '🙏 Registrar gratidão'}
             </button>
           </>
