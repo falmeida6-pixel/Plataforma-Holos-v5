@@ -49,13 +49,13 @@ export default function AnaliseHolos() {
             <p style={{ fontSize:12, color:'#B8AFA0', lineHeight:1.6 }}>Após 3 meses de registros, você recebe uma análise completa por IA enviada no seu email.</p>
           </div>
         )}
-        <button onClick={() => navigate('/dor')}
+        <button onClick={() => navigate('/perfil')}
           style={{ width:'100%', height:46, borderRadius:12, background:'linear-gradient(135deg,#B7832F,#F0C76A)', color:'#080808', fontSize:14, fontWeight:700, fontFamily:'Inter, sans-serif', border:'none', cursor:'pointer', marginBottom:10 }}>
-          🎯 Ir para Auto Avaliação
+          👤 Ver Perfil
         </button>
-        <button onClick={() => navigate('/avaliacao')}
+        <button onClick={() => navigate('/dor')}
           style={{ width:'100%', height:44, borderRadius:12, background:'transparent', border:'1px solid rgba(201,154,61,0.25)', color:'#C99A3D', fontSize:13, fontFamily:'Inter, sans-serif', cursor:'pointer' }}>
-          📊 Ver Avaliação Evolutiva
+          🎯 Eu Hoje
         </button>
       </div>
     </>

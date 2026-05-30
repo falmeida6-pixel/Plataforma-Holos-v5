@@ -13,7 +13,7 @@ const BLOCOS = [
   {
     titulo:'CUIDADO', cor:'#3D9ED8',
     itens:[
-      { path:'/dor', emoji:'🎯', label:'Auto Avaliação', desc:'O que pede mais atenção hoje?' },
+      { path:'/dor', emoji:'🌿', label:'Eu Hoje', desc:'O que pede mais atenção hoje?' },
       { path:'/biblioteca', emoji:'📚', label:'Biblioteca', desc:'Livros, filmes e docs' },
     ]
   },

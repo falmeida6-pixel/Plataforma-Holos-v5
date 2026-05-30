@@ -3,10 +3,10 @@ import { useNavigate, useLocation } from 'react-router-dom'
 
 const NAV_USUARIO = [
   { path:'/', label:'Reflexão', emoji:'🌅' },
-  { path:'/home', label:'Home', emoji:'⊞' },
+  { path:'/analise', label:'Diário', emoji:'📓' },
+  { path:'/gratidao', label:'Gratidão', emoji:'🙏' },
   { path:'/checkin', label:'Check-in', emoji:'✅' },
-  { path:'/dor', label:'Hoje', emoji:'🌿' },
-  { path:'/perfil', label:'Perfil', emoji:'👤' },
+  { path:'/home', label:'Home', emoji:'⊞' },
 ]
 
 const NAV_PRO = [
@@ -56,6 +56,8 @@ export default function BottomNav({ tipoPerfil }) {
   const isActive = (path) => {
     if (path === '#mais') return menuAberto
     if (path === '/') return location.pathname === '/' || location.pathname === '/reflexao'
+    if (path === '/analise') return location.pathname === '/analise' || location.pathname === '/diario'
+    if (path === '/gratidao') return location.pathname === '/gratidao'
     if (path === '/dor') return location.pathname === '/dor' || location.pathname === '/dores'
     return location.pathname === path
   }

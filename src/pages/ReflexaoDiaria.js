@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { useNavigate } from 'react-router-dom'
 import { APP_URL, APP_NAME, APP_TAGLINE } from '../lib/config'
+import { hojeLocal } from '../lib/dataLocal'
 
 export default function ReflexaoDiaria() {
   const navigate = useNavigate()
@@ -20,7 +21,7 @@ export default function ReflexaoDiaria() {
   }, [])
 
   async function carregarReflexao() {
-    const hj = hoje.toISOString().split('T')[0]
+    const hj = hojeLocal()
     const { data } = await supabase
       .from('reflexoes_dia').select('*').eq('ativa', true)
       .lte('data', hj).order('data', { ascending:false }).limit(1).single()

@@ -133,6 +133,7 @@ function AppRoutes() {
             <Route path="/avaliacao" element={<AvaliacaoEvolutiva/>}/>
             <Route path="/mapa" element={<MapaHolos/>}/>
             <Route path="/analise" element={<AnaliseHolos/>}/>
+            <Route path="/diario" element={<AnaliseHolos/>}/>
             <Route path="/dor" element={<EscolhaDor/>}/>
             <Route path="/dores" element={<EscolhaDor/>}/>
             <Route path="/rodas" element={<RodasHolos/>}/>
